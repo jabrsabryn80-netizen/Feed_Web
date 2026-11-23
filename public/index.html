@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الحضور | تصنيع الغذاء</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{--g:#386641;--l:#a7c957;--gold:#f2cc8f;--cream:#f8f5ec;--ink:#243126;--muted:#69756b;--line:#e4e8df}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Tahoma,Arial,sans-serif}header{background:var(--g);color:#fff;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{display:flex;gap:12px;align-items:center}.logo{background:var(--gold);color:var(--g);border-radius:14px;width:44px;height:44px;display:grid;place-items:center;font-size:23px}h1{font-size:20px;margin:0}header p{font-size:12px;margin:4px 0 0;color:#e5eddf}main{max-width:1000px;margin:28px auto;padding:0 16px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin:16px 0;box-shadow:0 8px 24px #263b2410}.auth{max-width:500px;margin:24px auto}.hero{text-align:center;color:var(--g)}.tabs,.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tabs{margin:18px 0}.tab,button{font:inherit;cursor:pointer}.tab,input,textarea{padding:12px;border:1px solid var(--line);border-radius:10px;background:white}.tab.active,.primary{background:var(--g);color:white;border-color:var(--g)}label{display:block;font-size:13px;font-weight:bold;margin:13px 0 6px}input,textarea{width:100%;font:inherit}.primary,.secondary,.danger{border:0;border-radius:10px;padding:11px 15px;margin-top:12px}.primary{background:var(--g);color:#fff}.secondary{background:#edf3e8;color:var(--g)}.danger{background:#fff0ed;color:#a33b2c}.full{width:100%}.hidden{display:none!important}.muted{color:var(--muted);font-size:12px;line-height:1.8}.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:15px;background:#f5f8f1;border-radius:12px}.stat b{display:block;font-size:23px;color:var(--g)}.item{padding:12px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.item:last-child{border:0}.notice{background:#fff8e9;border:1px solid #f0dfba;padding:12px;border-radius:12px;font-size:13px;line-height:1.8;margin-top:12px}.qr{display:block;max-width:280px;width:100%;margin:14px auto}.empty{font-size:13px;color:var(--muted);padding:12px 0}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}footer a{color:#a33b2c;cursor:pointer;text-decoration:underline}.payload{direction:ltr;font-family:monospace;font-size:12px;min-height:70px}@media(max-width:620px){.grid,.stats{grid-template-columns:1fr}.panel{padding:16px}}
+</style></head><body>
+<header><div class="brand"><div class="logo">🌿</div><div><h1>نظام الحضور والغياب</h1><p>جامعة طيبة التكنولوجية · قسم تصنيع الغذاء</p></div></div></header>
+<main>
+<div id="setup" class="panel auth hidden"><div class="hero"><h2>إعداد المدير الرئيسي</h2><p>أنشئ حساب المدير لأول مرة</p></div><label>اسم المدير</label><input id="setupName"><label>رقم الموبايل</label><input id="setupPhone" inputmode="tel"><label>كلمة المرور (10 أحرف على الأقل)</label><input id="setupPass" type="password"><button class="primary full" onclick="setupAdmin()">إنشاء حساب المدير</button></div>
+<div id="auth" class="panel auth hidden"><div class="hero"><h2>أهلاً بك</h2><p>تسجيل الدخول إلى نظام الحضور</p></div><div class="tabs"><button class="tab active" id="studentTab" onclick="mode='student';toggleMode()">طالب</button><button class="tab" id="staffTab" onclick="mode='staff';toggleMode()">الإدارة</button></div>
+<div id="loginBox"><label>رقم الموبايل</label><input id="phone" inputmode="tel"><label>كلمة المرور</label><input id="password" type="password"><button class="primary full" onclick="login()">تسجيل الدخول</button><button class="secondary full" id="signupToggle" onclick="showSignup()">إنشاء حساب طالب جديد</button></div>
+<div id="signupBox" class="hidden"><label>الاسم بالكامل</label><input id="regName"><label>رقم الموبايل</label><input id="regPhone" inputmode="tel"><label>كلمة المرور (10 أحرف على الأقل)</label><input id="regPass" type="password"><button class="primary full" onclick="registerStudent()">إنشاء الحساب</button><button class="secondary full" onclick="hideSignup()">رجوع</button></div><p class="muted">الطلاب ينشئون حساباتهم بأنفسهم. المدير ينشئ حسابات المدرسين من لوحة الإدارة.</p></div>
+<div id="app" class="hidden"><div class="top"><div><h2 id="hello" style="color:var(--g);margin:0"></h2><p id="role" class="muted"></p></div><button class="secondary" onclick="logout()">تسجيل الخروج</button></div><div id="stats" class="stats"></div>
+<div id="adminBox" class="panel hidden"><h3 style="color:var(--g)">إضافة مدرس / دكتور</h3><div class="grid"><div><label>اسم المدرس</label><input id="tName"></div><div><label>رقم الموبايل</label><input id="tPhone" inputmode="tel"></div><div><label>كلمة مرور مؤقتة (10 أحرف على الأقل)</label><input id="tPass" type="password"></div><div><label>المقرر</label><input id="tCourse"></div></div><button class="primary" onclick="addTeacher()">إضافة المدرس</button><h3 style="color:var(--g);margin-top:22px">المدرسون</h3><div id="teachers" class="empty">جارٍ التحميل...</div></div>
+<div id="staffBox" class="panel hidden"><h3 style="color:var(--g)">فتح جلسة حضور</h3><div class="grid"><div><label>المقرر</label><input id="course"></div><div><label>المجموعة / الفرقة</label><input id="groupName"></div></div><button class="primary" onclick="openSession()">فتح جلسة QR (5 دقائق)</button><div id="qrBox" class="hidden"><div class="notice">اعرض رمز QR على الطلاب. صلاحيته خمس دقائق، ويمكن استخدامه مرة واحدة لكل طالب في الجلسة.</div><img id="qrImg" class="qr hidden" alt="QR"><p id="qrCaption" class="muted" style="text-align:center"></p><label>بيانات QR (انسخها وأعطها للطالب للتجربة)</label><textarea id="qrText" class="payload" readonly onclick="this.select()"></textarea></div><h3 style="color:var(--g);margin-top:22px">الجلسات</h3><div id="sessions" class="empty"></div></div>
+<div id="studentBox" class="panel hidden"><h3 style="color:var(--g)">تسجيل الحضور بمسح QR</h3><p class="muted">الصق بيانات QR التي يعرضها المدرس ثم اضغط تأكيد الحضور.</p><label>بيانات QR</label><input id="qrPayload" placeholder='{"sessionId":"...","token":"..."}'><button class="primary" onclick="scanPayload()">تأكيد الحضور</button><h3 style="color:var(--g);margin-top:22px">سجل حضوري</h3><div id="mine" class="empty"></div></div>
+<div id="attendanceBox" class="panel"><h3 style="color:var(--g)">سجل الحضور</h3><div id="attendance" class="empty"></div></div>
+</div>
+</main><footer>قسم تصنيع الغذاء · جامعة طيبة التكنولوجية<br>النسخة التجريبية: البيانات محفوظة داخل هذا المتصفح فقط · <a onclick="resetAll()">مسح كل البيانات</a></footer>
+<script>
+let mode='student',me=null;
+const $=id=>document.getElementById(id);
+const KEY='attendance_demo_v1';
+const mem={};
+function load(){try{let s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch{}return mem.db||{users:[],sessions:[],attendance:[],nextId:1,me:null}}
+function save(db){mem.db=db;try{localStorage.setItem(KEY,JSON.stringify(db))}catch{}}
+function fail(m){throw Error(m)}
+function checkPass(p){if(!p||p.length<10)fail('كلمة المرور يجب أن تكون 10 أحرف على الأقل')}
+function checkPhone(p){if(!p||!/^[0-9+]{7,15}$/.test(p.trim()))fail('رقم الموبايل غير صحيح')}
+function now(){return new Date().toLocaleString('ar-EG')}
+function rid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36)}
+function publicUser(u){return {id:u.id,name:u.name,phone:u.phone,role:u.role,course:u.course||''}}
+function makeQr(text){try{let q=qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(6)}catch{return ''}}
+// Local replacement for the server API
+async function api(url,opts={}){
+ const db=load(),body=opts.body?JSON.parse(opts.body):{},method=(opts.method||'GET').toUpperCase();
+ const user=db.me?db.users.find(u=>u.id===db.me):null;
+ const need=(...roles)=>{if(!user)fail('يجب تسجيل الدخول');if(roles.length&&!roles.includes(user.role))fail('غير مصرح')};
+ if(url==='/api/status')return {setupRequired:!db.users.some(u=>u.role==='admin')};
+ if(url==='/api/setup'){if(db.users.some(u=>u.role==='admin'))fail('تم الإعداد مسبقاً');if(!body.name||!body.name.trim())fail('الاسم مطلوب');checkPhone(body.phone);checkPass(body.password);
+  let u={id:db.nextId++,name:body.name.trim(),phone:body.phone.trim(),password:body.password,role:'admin'};db.users.push(u);db.me=u.id;save(db);return {user:publicUser(u)}}
+ if(url==='/api/me'){need();return {user:publicUser(user)}}
+ if(url==='/api/auth/login'){let u=db.users.find(x=>x.phone===(body.phone||'').trim()&&x.password===body.password);if(!u)fail('رقم الموبايل أو كلمة المرور غير صحيحة');db.me=u.id;save(db);return {user:publicUser(u)}}
+ if(url==='/api/auth/logout'){db.me=null;save(db);return {ok:true}}
+ if(url==='/api/students/register'){if(!body.name||!body.name.trim())fail('الاسم مطلوب');checkPhone(body.phone);checkPass(body.password);
+  if(db.users.some(x=>x.phone===body.phone.trim()))fail('رقم الموبايل مسجل بالفعل');
+  db.users.push({id:db.nextId++,name:body.name.trim(),phone:body.phone.trim(),password:body.password,role:'student'});save(db);return {ok:true}}
+ if(url==='/api/admin/teachers'&&method==='GET'){need('admin');return {teachers:db.users.filter(u=>u.role==='teacher').map(publicUser)}}
+ if(url==='/api/admin/teachers'&&method==='POST'){need('admin');if(!body.name||!body.name.trim())fail('اسم المدرس مطلوب');checkPhone(body.phone);checkPass(body.password);
+  if(db.users.some(x=>x.phone===body.phone.trim()))fail('رقم الموبايل مسجل بالفعل');
+  db.users.push({id:db.nextId++,name:body.name.trim(),phone:body.phone.trim(),password:body.password,role:'teacher',course:(body.course||'').trim()});save(db);return {ok:true}}
+ if(url.startsWith('/api/admin/teachers/')&&method==='DELETE'){need('admin');let id=+url.split('/').pop();db.users=db.users.filter(u=>!(u.id===id&&u.role==='teacher'));save(db);return {ok:true}}
+ if(url==='/api/sessions'&&method==='POST'){need('admin','teacher');if(!body.course||!body.course.trim()||!body.groupName||!body.groupName.trim())fail('أدخل المقرر والمجموعة');
+  let s={id:rid(),teacherId:user.id,course:body.course.trim(),group_name:body.groupName.trim(),token:rid()+rid(),expires:Date.now()+5*60*1000,closed:false};
+  db.sessions.push(s);save(db);let payload=JSON.stringify({sessionId:s.id,token:s.token});
+  return {session:{id:s.id,course:s.course,groupName:s.group_name,payload,qrDataUrl:makeQr(payload)}}}
+ if(url.startsWith('/api/sessions/')&&url.endsWith('/close')){need('admin','teacher');let id=url.split('/')[3];let s=db.sessions.find(x=>x.id===id);if(!s)fail('الجلسة غير موجودة');s.closed=true;save(db);return {ok:true}}
+ if(url==='/api/attendance/scan'){need('student');let s=db.sessions.find(x=>x.id===body.sessionId);
+  if(!s||s.token!==body.token)fail('رمز QR غير صحيح');if(s.closed||Date.now()>s.expires)fail('انتهت صلاحية الجلسة');
+  if(db.attendance.some(a=>a.session_id===s.id&&a.student_id===user.id))fail('تم تسجيل حضورك في هذه الجلسة بالفعل');
+  db.attendance.unshift({id:db.nextId++,session_id:s.id,student_id:user.id,student_name:user.name,course:s.course,group_name:s.group_name,checked_at:now()});save(db);return {message:'تم تسجيل حضورك بنجاح'}}
+ if(url==='/api/dashboard'){need();
+  if(user.role==='student'){let mine=db.attendance.filter(a=>a.student_id===user.id);return {stats:{myAttendance:mine.length},attendance:mine}}
+  let sess=db.sessions.filter(s=>user.role==='admin'||s.teacherId===user.id);let ids=new Set(sess.map(s=>s.id));
+  let att=db.attendance.filter(a=>ids.has(a.session_id));
+  return {stats:{students:db.users.filter(u=>u.role==='student').length,teachers:db.users.filter(u=>u.role==='teacher').length,attendance:att.length},
+   attendance:att,sessions:sess.slice().reverse().map(s=>({id:s.id,course:s.course,group_name:s.group_name,attendance_count:db.attendance.filter(a=>a.session_id===s.id).length,is_open:!s.closed&&Date.now()<=s.expires}))}}
+ fail('طلب غير معروف')}
+function resetAll(){if(!confirm('سيتم مسح كل البيانات المحفوظة. هل أنت متأكد؟'))return;try{localStorage.removeItem(KEY)}catch{}mem.db=null;location.reload()}
+function msg(e){alert(e.message||String(e))}
+function toggleMode(){$('studentTab').classList.toggle('active',mode==='student');$('staffTab').classList.toggle('active',mode==='staff');$('signupToggle').classList.toggle('hidden',mode!=='student');hideSignup()}
+function showSignup(){$('loginBox').classList.add('hidden');$('signupBox').classList.remove('hidden')}
+function hideSignup(){$('loginBox').classList.remove('hidden');$('signupBox').classList.add('hidden')}
+async function boot(){try{let s=await api('/api/status');if(s.setupRequired){$('setup').classList.remove('hidden');return}try{let m=await api('/api/me');me=m.user;await render()}catch{$('auth').classList.remove('hidden')}}catch(e){msg(e)}}
+async function setupAdmin(){try{let d=await api('/api/setup',{method:'POST',body:JSON.stringify({name:$('setupName').value,phone:$('setupPhone').value,password:$('setupPass').value})});me=d.user;await render()}catch(e){msg(e)}}
+async function login(){try{let d=await api('/api/auth/login',{method:'POST',body:JSON.stringify({phone:$('phone').value,password:$('password').value})});me=d.user;await render()}catch(e){msg(e)}}
+async function registerStudent(){try{await api('/api/students/register',{method:'POST',body:JSON.stringify({name:$('regName').value,phone:$('regPhone').value,password:$('regPass').value})});alert('تم إنشاء الحساب. سجل الدخول الآن.');hideSignup()}catch(e){msg(e)}}
+async function logout(){try{await api('/api/auth/logout',{method:'POST'})}catch{}me=null;$('app').classList.add('hidden');$('auth').classList.remove('hidden')}
+async function addTeacher(){try{await api('/api/admin/teachers',{method:'POST',body:JSON.stringify({name:$('tName').value,phone:$('tPhone').value,password:$('tPass').value,course:$('tCourse').value})});['tName','tPhone','tPass','tCourse'].forEach(x=>$(x).value='');await render()}catch(e){msg(e)}}
+async function deleteTeacher(id){if(!confirm('حذف حساب المدرس؟'))return;try{await api('/api/admin/teachers/'+id,{method:'DELETE'});await render()}catch(e){msg(e)}}
+async function openSession(){try{let d=await api('/api/sessions',{method:'POST',body:JSON.stringify({course:$('course').value,groupName:$('groupName').value})});let img=$('qrImg');if(d.session.qrDataUrl){img.src=d.session.qrDataUrl;img.classList.remove('hidden')}else img.classList.add('hidden');$('qrText').value=d.session.payload;$('qrCaption').textContent=d.session.course+' · '+d.session.groupName+' · صلاحية 5 دقائق';$('qrBox').classList.remove('hidden');await render()}catch(e){msg(e)}}
+async function scanPayload(){try{let p;try{p=JSON.parse($('qrPayload').value)}catch{fail('بيانات QR غير صحيحة')}let d=await api('/api/attendance/scan',{method:'POST',body:JSON.stringify(p)});alert(d.message);$('qrPayload').value='';await render()}catch(e){msg(e)}}
+async function closeSession(id){try{await api('/api/sessions/'+id+'/close',{method:'POST'});await render()}catch(e){msg(e)}}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function render(){ $('auth').classList.add('hidden');$('setup').classList.add('hidden');$('app').classList.remove('hidden');$('hello').textContent='مرحباً، '+me.name;$('role').textContent=me.role==='admin'?'المدير الرئيسي':me.role==='teacher'?'مدرس / دكتور':'طالب';$('adminBox').classList.toggle('hidden',me.role!=='admin');$('staffBox').classList.toggle('hidden',me.role==='student');$('studentBox').classList.toggle('hidden',me.role!=='student');$('attendanceBox').classList.toggle('hidden',me.role==='student');
+let d=await api('/api/dashboard');if(me.role==='student'){$('stats').innerHTML=`<div class="stat"><b>${d.stats.myAttendance}</b>مرات الحضور</div>`;$('mine').innerHTML=d.attendance.length?d.attendance.map(x=>`<div class="item"><span>${esc(x.course)} · ${esc(x.group_name)}</span><span>${esc(x.checked_at)}</span></div>`).join(''):'<div class="empty">لا يوجد حضور مسجل.</div>';return}
+$('stats').innerHTML=`<div class="stat"><b>${d.stats.students}</b>الطلاب</div><div class="stat"><b>${d.stats.teachers}</b>المدرسون</div><div class="stat"><b>${d.stats.attendance}</b>سجلات الحضور</div>`;
+$('attendance').innerHTML=d.attendance.length?d.attendance.map(x=>`<div class="item"><div><b>${esc(x.student_name)}</b><div class="muted">${esc(x.course)} · ${esc(x.group_name)}</div></div><span>${esc(x.checked_at)}</span></div>`).join(''):'<div class="empty">لا توجد سجلات حضور بعد.</div>';
+$('sessions').innerHTML=d.sessions.length?d.sessions.map(s=>`<div class="item"><div><b>${esc(s.course)}</b><div class="muted">${esc(s.group_name)} · ${s.attendance_count} حضور · ${s.is_open?'مفتوحة':'مغلقة'}</div></div>${s.is_open?`<button class="secondary" onclick="closeSession('${s.id}')">إغلاق الجلسة</button>`:''}</div>`).join(''):'<div class="empty">لا توجد جلسات بعد.</div>';
+if(me.role==='admin'){let t=await api('/api/admin/teachers');$('teachers').innerHTML=t.teachers.length?t.teachers.map(x=>`<div class="item"><div><b>${esc(x.name)}</b><div class="muted">${esc(x.phone)} · ${esc(x.course||'')}</div></div><button class="danger" onclick="deleteTeacher(${x.id})">حذف</button></div>`).join(''):'<div class="empty">لم تتم إضافة مدرسين بعد.</div>'}
+}
+boot();
+</script></body></html>
